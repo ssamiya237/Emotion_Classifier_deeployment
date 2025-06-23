@@ -1,4 +1,4 @@
-# Emotion_Classifier_deeployment
+# Emotion_Classifier_deployment
 # Emotion Classifier API Deployment
 
 This project demonstrates the end-to-end process of developing, containerizing, and deploying a multi-label emotion classification model using machine learning and Google Cloud Platform (GCP). The application is served via a Flask API on **Cloud Run**, with secure API key authentication.
