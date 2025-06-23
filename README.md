@@ -1,96 +1,132 @@
 # Emotion_Classifier_deeployment
-# Multi-label Emotion Classification API
+# Emotion Classifier API Deployment
 
-This repository contains a deployed Flask API that performs multi-label emotion classification on English text inputs using a trained machine learning model.
-
----
-
-## Features
-
-- Multi-label classification (e.g., sadness, admiration, disgust)
-- Trained with TF-IDF + Truncated SVD + custom classifier
-- Hosted on Google Cloud Run
-- REST API secured with API key
+This project demonstrates the end-to-end process of developing, containerizing, and deploying a multi-label emotion classification model using machine learning and Google Cloud Platform (GCP). The application is served via a Flask API on **Cloud Run**, with secure API key authentication.
 
 ---
 
-## Project Structure
+## Problem Overview
+
+The objective is to classify one or more emotions from a given input sentence. This is a **multi-label text classification** problem where each sentence can express multiple emotions (e.g., sadness, disgust, admiration, etc.).
+
+---
+
+## ML Pipeline
+
+- **Data Preprocessing:**
+  - Vectorization using TF-IDF
+  - Dimensionality reduction using Truncated SVD
+
+- **Model Training:**
+  - Multi-label model using `OneVsRestClassifier` with `XGBoost` as base estimator
+  - Emotions included: `['admiration', 'amusement', 'anger', 'annoyance', 'approval', 'caring', 'confusion', 'curiosity', 'desire', 'disappointment', 'disgust', 'embarrassment', 'excitement', 'fear', 'gratitude', 'grief', 'joy', 'love', 'nervousness', 'optimism', 'pride', 'realization', 'relief', 'remorse', 'sadness', 'surprise', 'neutral']`
+
+- **Model Artifacts:**
+  - `model.joblib` – Final trained classifier
+  - `vectorizer.joblib` – TF-IDF vectorizer
+  - `svd_model.joblib` – SVD model
+  - `emotion_columns.joblib` – Emotion label columns
+
+---
+
+## Containerization (Docker)
+
+The API is containerized using Docker.  
+You can build and test it locally using:
+
+```bash
+docker build -t emotion-api .
+docker run -p 5000:5000 emotion-api
+```
+
+---
+
+## GCP Deployment (Cloud Run)
+
+Deployment commands used:
+
+```bash
+# Step 1: Submit Docker image
+gcloud builds submit --tag gcr.io/ml-deployment-project-463620/ml-api
+
+# Step 2: Deploy to Cloud Run
+gcloud run deploy ml-api \
+  --image gcr.io/ml-deployment-project-463620/ml-api \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-env-vars API_KEY=my-super-secret-api-key-2025
+```
+
+**Live Endpoint:**  
+`https://ml-api-1055958174760.us-central1.run.app/predict`
+
+**Auth Required:**  
+Header must include `x-api-key: my-super-secret-api-key-2025`
+
+---
+
+## Sample API Request (Python)
+
+```python
+import requests
+
+url = "https://ml-api-1055958174760.us-central1.run.app/predict"
+headers = {
+    "Content-Type": "application/json",
+    "x-api-key": "my-super-secret-api-key-2025"
+}
+payload = {
+    "input": [
+        "I am sad and disappointed.",
+        "You are amazing!",
+        "That was really exciting!",
+        "I feel so embarrassed and nervous.",
+        "This is disgusting!"
+    ]
+}
+response = requests.post(url, json=payload, headers=headers)
+print(response.json())
+```
+
+---
+
+## Challenges Faced
+
+- Initially, emotion predictions were too strict due to a high threshold for multi-label classification.
+- After analysis, a **threshold of 0.1** was chosen to increase the sensitivity of predictions and allow detection of more subtle or multiple emotions per input.
+- Cloud Run logs and testing were used to tune this decision iteratively.
+
+---
+
+## Repository Structure
 
 ```
 .
-├── app.py                  # Flask API
-├── Dockerfile              # Container definition
-├── requirements.txt        # Dependencies
-├── model.joblib            # Trained classifier
-├── vectorizer.joblib       # TF-IDF transformer
-├── svd_model.joblib        # SVD transformer
-├── emotion_columns.joblib  # List of emotion labels
-└── predict_test.py         # Sample client request script
+├── ML_deployment.ipynb        # Model training & evaluation notebook
+├── app.py                     # Flask app to serve predictions
+├── Dockerfile                 # Container definition
+├── requirements.txt           # Python dependencies
+├── model.joblib               # Trained model
+├── vectorizer.joblib          # TF-IDF vectorizer
+├── svd_model.joblib           # SVD dimensionality reducer
+├── emotion_columns.joblib     # List of output emotion labels
+└── README.md                  # This file
 ```
 
 ---
 
-## Setup Instructions
+## Project Completed Features
 
-### 1. Clone Repository
-
-```bash
-git clone https://github.com/YOUR_USERNAME/emotion-classifier-api.git
-cd emotion-classifier-api
-```
-
-### 2. Create Virtual Environment and Install Dependencies
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-### 3. Run Locally
-
-```bash
-python app.py
-```
+- Model training and evaluation
+- Containerization via Docker
+- Deployment to GCP Cloud Run with secure API key
+- API endpoint tested and functioning
+- Repository includes all artifacts and documentation
 
 ---
 
-## Testing the API
+## 👩‍💻 Author
 
-Send a POST request to `/predict`:
-
-```bash
-curl -X POST https://your-api-url.run.app/predict      -H "Content-Type: application/json"      -H "x-api-key: my-super-secret-api-key-2025"      -d '{"input": ["I am sad and disappointed."]}'
-```
-
-Or use `predict_test.py` script to send sample inputs.
-
----
-
-## Docker and GCP Deployment
-
-### Build Docker Image
-
-```bash
-gcloud builds submit --tag gcr.io/ml-deployment-project-463620/ml-api
-```
-
-### Deploy to Cloud Run
-
-```bash
-gcloud run deploy ml-api   --image gcr.io/ml-deployment-project-463620/ml-api   --platform managed   --region us-central1   --allow-unauthenticated   --set-env-vars API_KEY=my-super-secret-api-key-2025
-```
-
----
-
-## Known Challenges
-
-- Model failed to detect some emotions with default threshold.
-- Resolved by lowering threshold to `0.1` for higher recall in emotion detection.
-
----
-
-## Author
-
-Samiya Sarwar  
-Seneca Polytechnic | AIG 200  
+**Samiya Sarwar**  
+GitHub: [@ssamiya237](https://github.com/ssamiya237)
