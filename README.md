@@ -19,7 +19,8 @@ The objective is to classify one or more emotions from a given input sentence. T
 
 - **Model Training:**
   - Multi-label model using `OneVsRestClassifier` with `XGBoost` as base estimator
-  - Emotions included: `['admiration', 'amusement', 'anger', 'annoyance', 'approval', 'caring', 'confusion', 'curiosity', 'desire', 'disappointment', 'disgust', 'embarrassment', 'excitement', 'fear', 'gratitude', 'grief', 'joy', 'love', 'nervousness', 'optimism', 'pride', 'realization', 'relief', 'remorse', 'sadness', 'surprise', 'neutral']`
+  - Emotions included:  
+    `['admiration', 'amusement', 'anger', 'annoyance', 'approval', 'caring', 'confusion', 'curiosity', 'desire', 'disappointment', 'disgust', 'embarrassment', 'excitement', 'fear', 'gratitude', 'grief', 'joy', 'love', 'nervousness', 'optimism', 'pride', 'realization', 'relief', 'remorse', 'sadness', 'surprise', 'neutral']`
 
 - **Model Artifacts:**
   - `model.joblib` – Final trained classifier
